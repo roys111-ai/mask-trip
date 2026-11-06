@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>החופשה במסכה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0b1418; --deep:#0e1d23; --stone:#131f26;
+  --teal:#0f3d46; --teal-soft:#155a63;
+  --gold:#d9b26a; --gold-bright:#f2d08a;
+  --pearl:#f4ead9; --muted:#9db4b8;
+  --serif:'Frank Ruhl Libre',serif; --sans:'Heebo',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);color:var(--pearl);background:#0b1418;overflow-x:hidden}
+.grain{position:fixed;inset:0;pointer-events:none;opacity:.05;z-index:1;
+  background-image:radial-gradient(rgba(255,255,255,.8) .5px,transparent .5px);
+  background-size:3px 3px;}
+.app{position:relative;z-index:2;min-height:100vh}
+.screen{display:none;min-height:100vh;position:relative;animation:fade .9s ease both}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:saturate(.9) contrast(1.05)}
+.bg::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(11,20,24,.72),rgba(11,20,24,.88) 60%,rgba(11,20,24,.96));}
+.content{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;
+  justify-content:center;padding:clamp(28px,7vw,90px) clamp(22px,7vw,90px);
+  max-width:1080px;margin:auto}
+.kicker{font-size:.75rem;letter-spacing:.38em;text-transform:uppercase;color:var(--gold);opacity:.9;font-weight:500}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.3rem,7vw,4.4rem);line-height:1.12;margin:18px 0 8px}
+.riddle{font-family:var(--serif);font-size:clamp(1.12rem,2.7vw,1.6rem);
+  line-height:1.9;color:rgba(244,234,217,.92);max-width:620px;white-space:pre-line;margin-top:18px}
+.divider{width:64px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin:26px 0}
+.timer{display:flex;align-items:center;gap:16px;margin:30px 0 26px}
+.ring{position:relative;width:72px;height:72px;flex:none;cursor:pointer}
+.ring svg{transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:3}
+.ring .bg{stroke:rgba(244,234,217,.14)}
+.ring .fg{stroke:var(--gold);stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;font-size:.8rem;color:var(--gold-bright)}
+.note{font-size:.85rem;color:var(--muted);line-height:1.6}
+.note strong{color:var(--pearl);font-weight:500}
+.cta{align-self:flex-start;font-family:var(--sans);font-weight:500;font-size:1rem;
+  color:#0b1418;background:linear-gradient(120deg,var(--gold-bright),var(--gold));
+  border:none;border-radius:999px;padding:16px 34px;cursor:pointer;
+  box-shadow:0 14px 34px rgba(217,178,106,.22);
+  transition:transform .25s,opacity .25s,box-shadow .25s}
+.cta:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 18px 42px rgba(217,178,106,.3)}
+.cta:disabled{opacity:.3;cursor:not-allowed;box-shadow:none}
+.cta.ghost{background:transparent;color:var(--gold-bright);border:1px solid rgba(217,178,106,.45);box-shadow:none}
+.cta.ghost:hover{background:rgba(217,178,106,.08)}
+.secret-input{position:fixed;top:18px;right:18px;z-index:60;display:none;
+  background:rgba(11,20,24,.94);border:1px solid rgba(217,178,106,.4);
+  color:var(--pearl);padding:10px 14px;border-radius:10px;font-family:var(--sans)}
+.secret-input.show{display:block}
+.dots{display:flex;gap:8px;margin-top:34px}
+.dots span{width:7px;height:7px;border-radius:50%;background:rgba(244,234,217,.18)}
+.dots span.on{background:var(--gold)}
+.trip{max-width:860px;margin:auto;padding:clamp(30px,7vw,80px) clamp(20px,6vw,60px)}
+.day{border-top:1px solid rgba(217,178,106,.18);padding:clamp(28px,5vw,46px) 0}
+.day:first-of-type{border-top:none}
+.day h3{font-family:var(--serif);font-weight:400;color:var(--gold-bright);font-size:clamp(1.35rem,3vw,1.85rem);margin-bottom:14px}
+.day p{color:rgba(244,234,217,.82);line-height:1.9;white-space:pre-line}
+.photo{border-radius:18px;overflow:hidden;border:1px solid rgba(217,178,106,.2);margin:16px 0}
+.photo img{width:100%;height:clamp(170px,28vh,300px);object-fit:cover;display:block;filter:saturate(.92)}
+.photos{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:760px){.photos{grid-template-columns:1fr 1fr}}
+.final{text-align:center;padding:40px 0 0;font-family:var(--serif);font-size:clamp(1.2rem,2.6vw,1.6rem);color:var(--gold-bright);line-height:2}
+.mask{width:clamp(110px,16vw,160px);margin:0 auto 12px;opacity:.9}
+.mask path{fill:none;stroke:var(--gold);stroke-width:2.2;stroke-linecap:round}
+.foot{padding:26px 0 34px;text-align:center;color:rgba(157,180,184,.5);font-size:.78rem;letter-spacing:.25em}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<input class="secret-input" id="secretInput" placeholder="קוד סודי" inputmode="numeric" autocomplete="off">
+
+<div class="app" id="app"></div>
+
+<script>
+const SECRET="1234";
+const DURATION=10*60*1000;
+
+const INTRO="https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/3775842c-4349-56fc-94d2-0523b370bc87/c7c301e6-fde2-5f81-aa42-1c3a30c8e606.jpg";
+const HUMMUS="https://st.perplexity.ai/estatic/0b226c450798410ac541646c86ec31afd840e5beab817a5d84fa821e7db61981ec84c3b4a3f072a7a2e1899c9fb06c6e814e83d461a28901b1deac6ead6346636062d8bf70477ae86b9662f6903af918a5100b0d8def8481aae8e78d46e6bb7b88f0dba4967df825e2626ad5af3ce4a6";
+const ETNA="https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/ef50e286-0939-541a-9491-1007e81fbff5/42ed6d72-f9c6-5b21-bcda-b9944192ca1f.jpg";
+const ACITREZZA="https://st.perplexity.ai/estatic/0b226c450798410ac541646c86ec31afd840e5beab817a5d84fa821e7db61981ec84c3b4a3f072a7a2e1899c9fb06c6e83660f63e76e3f9b738e5bbefdb2e6bec298e0b903c1232b819f1ac2d035080b4bf07622881a46635730fa0053dfcccfbd5f9e38b7618c58c7d2c74a5e783242";
+const ACIREALE="https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/e7bbc1ee-d654-50bd-97f9-b2762f7ae5e8/56c34fc9-c332-503f-bf05-c7dead4094fa.jpg";
+const ARETHUSA="https://commons.wikimedia.org/wiki/Special:FilePath/Fonte_Aretusa_SIracusa_saro_di_bartolo-02.jpg";
+const ORTIGIA="https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/2cb208ea-0dfc-5fb7-a962-0a6c4937f0a5/6257f57e-c7ae-5b04-976a-b25dd14886af.jpg";
+const TAORMINA="https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/2baf8a0a-f2e3-5e1d-a7aa-f1997b5994fb/83b0f451-c035-5c23-ac54-bdea59ec3f49.jpg";
+const STARS="https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/3775842c-4349-56fc-94d2-0523b370bc87/c7c301e6-fde2-5f81-aa42-1c3a30c8e606.jpg";
+const VINEYARD="https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/f8028945-979d-5778-ac20-cd51226db71e/ab1bc0d4-5c5c-55b9-af65-56a89866a93f.jpg";
+const CATANIA_DAY="https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/120754d4-fb58-5687-9064-4f58385d-2691-5bec-8751-7d484b7b078e/6257f57e-c7ae-5b04-976a-b25dd14886af.jpg";
+
+const screens={
+intro:{kicker:"החופשה במסכה",title:"יש סיפורים שמתחילים<br>במחווה קטנה.",
+body:"זה אחד מהם.\n\nלפני שנתחיל — תצטרכי רק להסתכל.\n\nולפעמים, גם לאכול.",
+cta:"בואי נתחיל",img:INTRO},
+catania:{kicker:"המסכה הראשונה",title:"לפני שנצא",
+body:"יש דברים קטנים שמתחילים דברים גדולים.\n\nלפני שנצא, נאכל משהו קטן.\nלא כי אנחנו רעבים —\nאלא כי כך מתחילים מסע.",
+img:HUMMUS},
+etna:{kicker:"המסכה השנייה",title:"הלב שמתחת לאבן",
+body:"יש מקום שבו האדמה עוד לא החליטה אם היא יבשה או להבה.\n\nהוא התחיל מתחת לים,\nאבל לא נשאר שם.\nמתחת לרגלי ההולכים בו פועם חום עתיק,\nוהאבן צעירה יותר מהסיפורים שנכתבו עליה.\n\nזהו רק הקצה הראשון של חוט.\nבקצה השני מחכה לך משהו חם.",
+img:ETNA},
+acitrezza:{kicker:"המסכה השלישית",title:"המתנה של הים",
+body:"יש מקום שבו הים קיבל מתנה.\n\nאבנים כבדות, שחורות,\nשלא הגיעו אליו בעדינות.\n\nהוא לא החזיר אותן.\nהוא פשוט החליט לשמור.",
+img:ACITREZZA},
+acireale:{kicker:"המסכה הרביעית",title:"המקום שבו האדמה עצרה",
+body:"יש מקום שבו האדמה עשתה טעות בחישוב.\n\nהיא הלכה רחוק מדי,\nואז נזכרה שהיא לא יודעת לשחות.\n\nמאז היא עומדת שם,\nומסתכלת על הים מבלי להיכנס.",
+img:ACIREALE},
+siracusa:{kicker:"המסכה החמישית",title:"הפרח בלי הכתובת",
+body:"יש מים שלא נשארים במקום שבו התחילו.\n\nכך מספרים על נערה שביקשה מקלט,\nוהאלה שלה פתחה לה דרך\nשאף אחד לא יכול לראות.\n\nמתחת לים.\nמעבר למלח.\nועד למעיין על חוף אחר.\n\nעד היום מספרים שפרח שנזרק לנהר רחוק\nיכול להופיע שם.\n\nיש מקומות שמקבלים פרחים\nגם בלי למסור כתובת.",
+img:ARETHUSA},
+taormina:{kicker:"המסכה השישית",title:"התפקיד הראשי",
+body:"בנו שם מקום לשבת,\nומקום לעמוד,\nומקום להעמיד פנים.\n\nאבל התפקיד הראשי\nנשאר מחוץ לטקסט.\n\nהים לא למד את השורות שלו.\nההר לא חיכה לסימן.\n\nובכל זאת,\nזו ההצגה שאנחנו רוצים לראות.",
+img:TAORMINA},
+star:{kicker:"המסכה האחרונה",title:"הצורה בשמיים",
+body:"הצלחת. האבן.\nהמתנה שהים שמר.\nהאדמה שעצרה בקצה.\nהפרח בלי הכתובת. הבמה.\n\nשש מסכות.\nובכל אחת — כיוון אחר.\n\nבכל בוקר נצא אל אחת מהן.\nובכל ערב נחזור לאותו מקום.\n\nהמרכז נשאר.\nרק אנחנו מחליפים כיוון.\n\nואם נחבר את כל הדרכים,\nנגלה שגם לחופשה הזאת\nיש צורה בשמיים.",
+cta:"מי מסתתרת מאחורי המסכה?",
+img:STARS},
+reveal:{kicker:"החופשה במסכה",title:"המסכות יורדות",
+body:"אהובתי,\n\nארזי מזוודה — קלה,\nכי השמש תעשה את רוב העבודה.\n\nאנחנו טסים לסיציליה.\n\nמתחילים בקטניה.\nממשיכים אל הים של אצ׳י טרצה,\nאל הגובה של אצ׳יראלה,\nאל האש של אתנה,\nאל המים של סירקוזה ואורטיג׳ה,\nואל הבמה של טאורמינה.\n\nמקום אחד לחזור אליו.\nבכל בוקר — כיוון חדש.\n\nזה הכוכב שלנו.",
+cta:"למסלול",img:TAORMINA},
+itinerary:{itinerary:true}
+};
+
+const order=["intro","catania","etna","acitrezza","acireale","siracusa","taormina","star","reveal","itinerary"];
+const state=JSON.parse(localStorage.getItem("maskTrip")||'{"screen":"intro"}');
+function save(){localStorage.setItem("maskTrip",JSON.stringify(state));}
+
+const itinerary=[
+{title:"יום ההגעה — קטניה",img:CATANIA_DAY,
+text:"נגיע בשעות הלילה לקטניה ונעבור ישירות למלון Etna Suites — בית בוטיק מרכזי בלב העיר, עם חדרים מרווחים, ארוחות בוקר טובות ומיקום מעולה ליד האטרקציות המרכזיות. לאחר צ׳ק־אין ננוח ונתכונן ליום הראשון של הטיול."},
+{title:"יום 1 — קטניה וריביירת הקיקלופים",imgs:[CATANIA_DAY,ACITREZZA],
+text:"בבוקר נצא לסיור בקטניה, עיר הבארוק השחורה שנבנתה מאבן הלבה של האטנה. נטייל בשוק הדגים ההומה, נבקר בפיאצה דל דואומו ובקתדרלה, ונספוג את האווירה האותנטית של המרכז ההיסטורי.\n\nלאחר ארוחת צהריים ניסע לאצ׳י טרצה, כפר דייגים קסום על חוף הים היוני, השוכן לרגלי סלעי הפאראליוני האגדיים.\n\nאחר־הצהריים נצא לשייט סירה סביב איי הקיקלופים, עם נוף פנורמי של החוף האתנאי והסלעים הוולקניים."},
+{title:"יום 2 — טאורמינה ואצ׳יראלה",imgs:[TAORMINA,ACIREALE],
+text:"בבוקר ניסע לטאורמינה, ״מרפסת סיציליה״ המפורסמת, השוכנת על צוק בגובה 200 מטר מעל הים. נבקר בתיאטרון היווני העתיק, אחד המרשימים בעולם, ממנו נשקף נוף עוצר נשימה של הים והר האטנה. נטייל ברחובות העתיקים ובקורסו אומברטו, וניהנה מהאווירה האלגנטית של העיירה.\n\nלאחר מכן ניסע ברכבת לאצ׳יראלה, עיר בארוקית עשירה בכנסיות ובארמונות. נסייר בפיאצה דל דואומו ובקתדרלה, ולאחר מכן נרד בשביל ההיסטורי של ה־Chiazzette, דרך שמורת הטבע La Timpa, אל כפר הדייגים הציורי Santa Maria La Scala — מסלול קצר המשלב נוף ים, מצוקי לבה וצמחייה ים־תיכונית."},
+{title:"יום 3 — הר הגעש אתנה ויקבי האזור",imgs:[ETNA,VINEYARD],
+text:"יום שלם מוקדש להר הגעש הפעיל הגבוה באירופה. נצא בסיור מאורגן עם הסעה אל מדרונות האטנה, שם נחווה את הנוף הוולקני הייחודי — מכתשים, שדות לבה ונוף ירחי.\n\nבהמשך היום נבקר ביקב מקומי על מדרונות ההר, שם ניהנה מארוחת צהריים סיציליאנית מסורתית ומטעימות יין אטנה DOC — יין הגדל על קרקע וולקנית ומקבל ממנה את אופיו המינרלי הייחודי."},
+{title:"יום 4 — סירקוזה ואורטיג׳ה",imgs:[ORTIGIA,ARETHUSA],
+text:"יום שלם מוקדש לסירקוזה, העיר היוונית העתיקה שהייתה אחת החשובות בים התיכון. נבקר בפארק הארכיאולוגי ניאפוליס, שם נראה את התיאטרון היווני, האמפיתיאטרון הרומי ומערת ״אוזן דיוניסיוס״ המפורסמת.\n\nלאחר מכן נעבור לאורטיג׳ה, האי העתיק שבלב העיר, ונטייל בסמטאות הצרות, בפיאצה דל דואומו ובקתדרלה הבנויה על מקדש יווני עתיק. נסיים בטיול רגוע לאורך המזח ובנוף הים."},
+{title:"יום 5 — קטניה וסיום הטיול",img:CATANIA_DAY,
+text:"ביום האחרון ניהנה מבוקר חופשי ורגוע בקטניה — זמן לטיול נינוח, קניות אחרונות או ביקור באתרים שלא הספקנו. בצהריים ניסע לשדה התעופה לטיסה חזרה."}
+];
+
+function maskSVG(){return `<svg class="mask" viewBox="0 0 120 80"><path d="M18 26 C34 12 86 12 102 26 C104 48 88 68 60 68 C32 68 16 48 18 26 Z"/><path d="M34 34 C42 30 50 30 56 34"/><path d="M64 34 C70 30 78 30 86 34"/><path d="M46 52 C54 58 66 58 74 52"/></svg>`;}
+
+function render(){
+  const app=document.getElementById("app");
+  const s=screens[state.screen]||screens.intro;
+  if(s.itinerary){app.innerHTML=renderItinerary();bind();return;}
+  const isRiddle=["catania","etna","acitrezza","acireale","siracusa","taormina","star"].includes(state.screen);
+  const next=order[order.indexOf(state.screen)+1];
+  const dots=order.slice(1,8).map(k=>`<span class="${k===state.screen?'on':''}"></span>`).join("");
+  app.innerHTML=`
+  <section class="screen active">
+    <div class="bg" style="background-image:url('${s.img}')"></div>
+    <div class="content">
+      <div class="kicker">${s.kicker}</div>
+      <h1>${s.title}</h1>
+      <div class="divider"></div>
+      <p class="riddle">${s.body}</p>
+      ${isRiddle?timerHTML():""}
+      <button class="cta" id="next" data-next="${next}" ${isRiddle?"disabled":""}>${s.cta||"אני מוכנה להמשיך"}</button>
+      <div class="dots">${dots}</div>
+    </div>
+    <div class="foot">החופשה במסכה</div>
+  </section>`;
+  bind();
+  if(isRiddle)startTimer(state.screen);
+}
+
+function timerHTML(){
+  return `<div class="timer">
+    <div class="ring" id="timerRing">
+      <svg width="72" height="72" viewBox="0 0 72 72">
+        <circle class="bg" cx="36" cy="36" r="32"/>
+        <circle class="fg" id="ringFg" cx="36" cy="36" r="32" stroke-dasharray="201" stroke-dashoffset="0"/>
+      </svg>
+      <div class="num" id="timerNum">10:00</div>
+    </div>
+    <div class="note">למסכה יש זמן משלה.<br>כשהיא תיפתח — נמשיך.<br><strong>לחיצה ארוכה על הטבעת פותחת קוד.</strong></div>
+  </div>`;
+}
+
+let timerId=null;
+function startTimer(id){
+  clearInterval(timerId);
+  const key="deadline_"+id;
+  let deadline=Number(localStorage.getItem(key));
+  if(!deadline||deadline<Date.now()){deadline=Date.now()+DURATION;localStorage.setItem(key,deadline);}
+  const fg=document.getElementById("ringFg"),num=document.getElementById("timerNum"),btn=document.getElementById("next");
+  const total=201;
+  function tick(){
+    const left=deadline-Date.now();
+    if(left<=0){clearInterval(timerId);localStorage.removeItem(key);
+      if(fg)fg.style.strokeDashoffset=total;if(num)num.textContent="00:00";if(btn)btn.disabled=false;return;}
+    const p=left/DURATION;
+    if(fg)fg.style.strokeDashoffset=total*(1-p);
+    const m=Math.floor(left/60000),sec=Math.floor((left%60000)/1000);
+    if(num)num.textContent=`${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+  }
+  tick();timerId=setInterval(tick,1000);
+}
+
+function unlock(){
+  const id=state.screen;localStorage.removeItem("deadline_"+id);
+  clearInterval(timerId);
+  const btn=document.getElementById("next");if(btn)btn.disabled=false;
+  const fg=document.getElementById("ringFg");if(fg)fg.style.strokeDashoffset=201;
+  const num=document.getElementById("timerNum");if(num)num.textContent="פתוח";
+  document.getElementById("secretInput").classList.remove("show");
+}
+
+function renderItinerary(){
+  const days=itinerary.map(d=>`
+    <article class="day">
+      <h3>${d.title}</h3>
+      <div class="photos">${(d.imgs||[d.img]).filter(Boolean).map(u=>`<div class="photo"><img src="${u}" alt=""></div>`).join("")}</div>
+      <p>${d.text}</p>
+    </article>`).join("");
+  return `<section class="screen active"><div class="trip">
+    <div class="kicker">החופשה במסכה</div>
+    <h1>חופשה בסיציליה<br>— 5 ימים</h1>
+    <div class="divider"></div>
+    <p class="riddle">חמישה ימים מלאים של אש, מים, אבן וים.<br>יום הגעה להתמקם, ויום חזרה להיפרד.<br><br>מקום אחד לחזור אליו —<br>וכל בוקר, כיוון חדש.</p>
+    ${days}
+    <div class="final">${maskSVG()}חמישה ימים.<br>מקום אחד לחזור אליו.<br>וכל בוקר — כיוון חדש.</div>
+    <div style="text-align:center;margin-top:30px"><button class="cta ghost" id="restart">בואי נתחיל מחדש</button></div>
+  </div><div class="foot">החופשה במסכה</div></section>`;
+}
+
+function bind(){
+  const next=document.getElementById("next");
+  if(next)next.addEventListener("click",()=>{state.screen=next.dataset.next;save();render();window.scrollTo(0,0);});
+  const restart=document.getElementById("restart");
+  if(restart)restart.addEventListener("click",()=>{
+    Object.keys(localStorage).filter(k=>k.startsWith("deadline_")).forEach(k=>localStorage.removeItem(k));
+    state.screen="intro";save();render();window.scrollTo(0,0);
+  });
+}
+
+let pressTimer=null;
+document.addEventListener("pointerdown",e=>{
+  const ring=document.getElementById("timerRing");
+  if(ring&&ring.contains(e.target)){
+    pressTimer=setTimeout(()=>{
+      const input=document.getElementById("secretInput");
+      input.classList.add("show");input.focus();
+    },600);
+  }
+});
+document.addEventListener("pointerup",()=>{clearTimeout(pressTimer);});
+document.addEventListener("pointercancel",()=>{clearTimeout(pressTimer);});
+
+document.getElementById("secretInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){
+    if(e.target.value.trim()===SECRET)unlock();
+    else{e.target.value="";e.target.classList.remove("show");}
+  }
+});
+
+render();
+</script>
+</body>
+</html>
