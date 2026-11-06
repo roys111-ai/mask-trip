@@ -269,4 +269,137 @@ document.getElementById("secretInput").addEventListener("keydown",e=>{
 render();
 </script>
 </body>
+</html>לקטניה ונעבור ישירות למלון Etna Suites — בית בוטיק מרכזי בלב העיר, עם חדרים מרווחים, ארוחות בוקר טובות ומיקום מעולה ליד האטרקציות המרכזיות. לאחר צ׳ק־אין ננוח ונתכונן ליום הראשון של הטיול."},
+{title:"יום 1 — קטניה וריביירת הקיקלופים",imgs:[CATANIA_DAY,ACITREZZA],
+text:"בבוקר נצא לסיור בקטניה, עיר הבארוק השחורה שנבנתה מאבן הלבה של האטנה. נטייל בשוק הדגים ההומה, נבקר בפיאצה דל דואומו ובקתדרלה, ונספוג את האווירה האותנטית של המרכז ההיסטורי.\n\nלאחר ארוחת צהריים ניסע לאצ׳י טרצה, כפר דייגים קסום על חוף הים היוני, השוכן לרגלי סלעי הפאראליוני האגדיים.\n\nאחר־הצהריים נצא לשייט סירה סביב איי הקיקלופים, עם נוף פנורמי של החוף האתנאי והסלעים הוולקניים."},
+{title:"יום 2 — טאורמינה ואצ׳יראלה",imgs:[TAORMINA,ACIREALE],
+text:"בבוקר ניסע לטאורמינה, ״מרפסת סיציליה״ המפורסמת, השוכנת על צוק בגובה 200 מטר מעל הים. נבקר בתיאטרון היווני העתיק, אחד המרשימים בעולם, ממנו נשקף נוף עוצר נשימה של הים והר האטנה. נטייל ברחובות העתיקים ובקורסו אומברטו, וניהנה מהאווירה האלגנטית של העיירה.\n\nלאחר מכן ניסע ברכבת לאצ׳יראלה, עיר בארוקית עשירה בכנסיות ובארמונות. נסייר בפיאצה דל דואומו ובקתדרלה, ולאחר מכן נרד בשביל ההיסטורי של ה־Chiazzette, דרך שמורת הטבע La Timpa, אל כפר הדייגים הציורי Santa Maria La Scala — מסלול קצר המשלב נוף ים, מצוקי לבה וצמחייה ים־תיכונית."},
+{title:"יום 3 — הר הגעש אתנה ויקבי האזור",imgs:[ETNA,VINEYARD],
+text:"יום שלם מוקדש להר הגעש הפעיל הגבוה באירופה. נצא בסיור מאורגן עם הסעה אל מדרונות האטנה, שם נחווה את הנוף הוולקני הייחודי — מכתשים, שדות לבה ונוף ירחי.\n\nבהמשך היום נבקר ביקב מקומי על מדרונות ההר, שם ניהנה מארוחת צהריים סיציליאנית מסורתית ומטעימות יין אטנה DOC — יין הגדל על קרקע וולקנית ומקבל ממנה את אופיו המינרלי הייחודי."},
+{title:"יום 4 — סירקוזה ואורטיג׳ה",imgs:[ORTIGIA,ARETHUSA],
+text:"יום שלם מוקדש לסירקוזה, העיר היוונית העתיקה שהייתה אחת החשובות בים התיכון. נבקר בפארק הארכיאולוגי ניאפוליס, שם נראה את התיאטרון היווני, האמפיתיאטרון הרומי ומערת ״אוזן דיוניסיוס״ המפורסמת.\n\nלאחר מכן נעבור לאורטיג׳ה, האי העתיק שבלב העיר, ונטייל בסמטאות הצרות, בפיאצה דל דואומו ובקתדרלה הבנויה על מקדש יווני עתיק. נסיים בטיול רגוע לאורך המזח ובנוף הים."},
+{title:"יום 5 — קטניה וסיום הטיול",img:CATANIA_DAY,
+text:"ביום האחרון ניהנה מבוקר חופשי ורגוע בקטניה — זמן לטיול נינוח, קניות אחרונות או ביקור באתרים שלא הספקנו. בצהריים ניסע לשדה התעופה לטיסה חזרה."}
+];
+
+function maskSVG(){return `<svg class="mask" viewBox="0 0 120 80"><path d="M18 26 C34 12 86 12 102 26 C104 48 88 68 60 68 C32 68 16 48 18 26 Z"/><path d="M34 34 C42 30 50 30 56 34"/><path d="M64 34 C70 30 78 30 86 34"/><path d="M46 52 C54 58 66 58 74 52"/></svg>`;}
+
+function render(){
+  const app=document.getElementById("app");
+  const s=screens[state.screen]||screens.intro;
+  if(s.itinerary){app.innerHTML=renderItinerary();bind();return;}
+  const isRiddle=["catania","etna","acitrezza","acireale","siracusa","taormina","star"].includes(state.screen);
+  const next=order[order.indexOf(state.screen)+1];
+  const dots=order.slice(1,8).map(k=>`<span class="${k===state.screen?'on':''}"></span>`).join("");
+  app.innerHTML=`
+  <section class="screen active">
+    <div class="bg" style="background-image:url('${s.img}')"></div>
+    <div class="content">
+      <div class="kicker">${s.kicker}</div>
+      <h1>${s.title}</h1>
+      <div class="divider"></div>
+      <p class="riddle">${s.body}</p>
+      ${isRiddle?timerHTML():""}
+      <button class="cta" id="next" data-next="${next}" ${isRiddle?"disabled":""}>${s.cta||"אני מוכנה להמשיך"}</button>
+      <div class="dots">${dots}</div>
+    </div>
+    <div class="foot">החופשה במסכה</div>
+  </section>`;
+  bind();
+  if(isRiddle)startTimer(state.screen);
+}
+
+function timerHTML(){
+  return `<div class="timer">
+    <div class="ring" id="timerRing">
+      <svg width="72" height="72" viewBox="0 0 72 72">
+        <circle class="bg" cx="36" cy="36" r="32"/>
+        <circle class="fg" id="ringFg" cx="36" cy="36" r="32" stroke-dasharray="201" stroke-dashoffset="0"/>
+      </svg>
+      <div class="num" id="timerNum">10:00</div>
+    </div>
+    <div class="note">למסכה יש זמן משלה.<br>כשהיא תיפתח — נמשיך.<br><strong>לחיצה ארוכה על הטבעת פותחת קוד.</strong></div>
+  </div>`;
+}
+
+let timerId=null;
+function startTimer(id){
+  clearInterval(timerId);
+  const key="deadline_"+id;
+  let deadline=Number(localStorage.getItem(key));
+  if(!deadline||deadline<Date.now()){deadline=Date.now()+DURATION;localStorage.setItem(key,deadline);}
+  const fg=document.getElementById("ringFg"),num=document.getElementById("timerNum"),btn=document.getElementById("next");
+  const total=201;
+  function tick(){
+    const left=deadline-Date.now();
+    if(left<=0){clearInterval(timerId);localStorage.removeItem(key);
+      if(fg)fg.style.strokeDashoffset=total;if(num)num.textContent="00:00";if(btn)btn.disabled=false;return;}
+    const p=left/DURATION;
+    if(fg)fg.style.strokeDashoffset=total*(1-p);
+    const m=Math.floor(left/60000),sec=Math.floor((left%60000)/1000);
+    if(num)num.textContent=`${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+  }
+  tick();timerId=setInterval(tick,1000);
+}
+
+function unlock(){
+  const id=state.screen;localStorage.removeItem("deadline_"+id);
+  clearInterval(timerId);
+  const btn=document.getElementById("next");if(btn)btn.disabled=false;
+  const fg=document.getElementById("ringFg");if(fg)fg.style.strokeDashoffset=201;
+  const num=document.getElementById("timerNum");if(num)num.textContent="פתוח";
+  document.getElementById("secretInput").classList.remove("show");
+}
+
+function renderItinerary(){
+  const days=itinerary.map(d=>`
+    <article class="day">
+      <h3>${d.title}</h3>
+      <div class="photos">${(d.imgs||[d.img]).filter(Boolean).map(u=>`<div class="photo"><img src="${u}" alt=""></div>`).join("")}</div>
+      <p>${d.text}</p>
+    </article>`).join("");
+  return `<section class="screen active"><div class="trip">
+    <div class="kicker">החופשה במסכה</div>
+    <h1>חופשה בסיציליה<br>— 5 ימים</h1>
+    <div class="divider"></div>
+    <p class="riddle">חמישה ימים מלאים של אש, מים, אבן וים.<br>יום הגעה להתמקם, ויום חזרה להיפרד.<br><br>מקום אחד לחזור אליו —<br>וכל בוקר, כיוון חדש.</p>
+    ${days}
+    <div class="final">${maskSVG()}חמישה ימים.<br>מקום אחד לחזור אליו.<br>וכל בוקר — כיוון חדש.</div>
+    <div style="text-align:center;margin-top:30px"><button class="cta ghost" id="restart">בואי נתחיל מחדש</button></div>
+  </div><div class="foot">החופשה במסכה</div></section>`;
+}
+
+function bind(){
+  const next=document.getElementById("next");
+  if(next)next.addEventListener("click",()=>{state.screen=next.dataset.next;save();render();window.scrollTo(0,0);});
+  const restart=document.getElementById("restart");
+  if(restart)restart.addEventListener("click",()=>{
+    Object.keys(localStorage).filter(k=>k.startsWith("deadline_")).forEach(k=>localStorage.removeItem(k));
+    state.screen="intro";save();render();window.scrollTo(0,0);
+  });
+}
+
+let pressTimer=null;
+document.addEventListener("pointerdown",e=>{
+  const ring=document.getElementById("timerRing");
+  if(ring&&ring.contains(e.target)){
+    pressTimer=setTimeout(()=>{
+      const input=document.getElementById("secretInput");
+      input.classList.add("show");input.focus();
+    },600);
+  }
+});
+document.addEventListener("pointerup",()=>{clearTimeout(pressTimer);});
+document.addEventListener("pointercancel",()=>{clearTimeout(pressTimer);});
+
+document.getElementById("secretInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){
+    if(e.target.value.trim()===SECRET)unlock();
+    else{e.target.value="";e.target.classList.remove("show");}
+  }
+});
+
+render();
+</script>
+</body>
 </html>
